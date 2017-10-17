@@ -118,18 +118,18 @@ void HWComposer::present(HWComposerNativeWindowBuffer *buffer)
 {
     QPA_HWC_TIMING_SAMPLE(presentTime);
 
-    fblayer->handle = buffer->handle;
-    fblayer->releaseFenceFd = -1;
+    mlist[0]->hwLayers[0].handle = buffer->handle;
+    mlist[0]->hwLayers[0].releaseFenceFd = -1;
 
 #ifdef QPA_HWC_SYNC_BEFORE_SET
     int acqFd = getFenceBufferFd(buffer);
     if (acqFd >= 0) {
         sync_wait(acqFd, -1);
         close(acqFd);
-        fblayer->acquireFenceFd = -1;
+        mlist[0]->hwLayers[0].acquireFenceFd = -1;
     }
 #else
-    fblayer->acquireFenceFd = getFenceBufferFd(buffer);
+    mlist[0]->hwLayers[0].acquireFenceFd = getFenceBufferFd(buffer);
 #endif
 
     QPA_HWC_TIMING_SAMPLE(syncTime);
@@ -144,7 +144,7 @@ void HWComposer::present(HWComposerNativeWindowBuffer *buffer)
 
     QPA_HWC_TIMING_SAMPLE(setTime);
 
-    setFenceBufferFd(buffer, fblayer->releaseFenceFd);
+    setFenceBufferFd(buffer, mlist[0]->hwLayers[0].releaseFenceFd);
 
     if (mlist[0]->retireFenceFd != -1) {
         close(mlist[0]->retireFenceFd);
@@ -292,7 +292,7 @@ HwComposerBackend_v11::createWindow(int width, int height)
 
 
     HWComposer *hwc_win = new HWComposer(width, height, HAL_PIXEL_FORMAT_RGBA_8888,
-                                         hwc_device, hwc_mList, &hwc_list->hwLayers[1], num_displays);
+                                         hwc_device, hwc_mList, &hwc_list->hwLayers[0], num_displays);
     return (EGLNativeWindowType) static_cast<ANativeWindow *>(hwc_win);
 }
 
@@ -385,7 +385,7 @@ HwComposerBackend_v11::sleepDisplay(bool sleep)
 
 #ifdef HWC_DEVICE_API_VERSION_1_4
         if (hwc_version == HWC_DEVICE_API_VERSION_1_4) {
-            HWC_PLUGIN_EXPECT_ZERO(hwc_device->setPowerMode(hwc_device, 0, HWC_POWER_MODE_NORMAL));
+            //HWC_PLUGIN_EXPECT_ZERO(hwc_device->setPowerMode(hwc_device, 0, HWC_POWER_MODE_NORMAL));
         } else
 #endif
 #ifdef HWC_DEVICE_API_VERSION_1_5
