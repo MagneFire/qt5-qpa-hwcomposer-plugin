@@ -410,8 +410,11 @@ void HwComposerBackend_v11::handleVSyncEvent()
     QSet<QWindow *> pendingWindows = m_pendingUpdate;
     m_pendingUpdate.clear();
     foreach (QWindow *w, pendingWindows) {
-        QWindowPrivate *wp = (QWindowPrivate *) QWindowPrivate::get(w);
-        wp->deliverUpdateRequest();
+        QPlatformWindow *platformWindow = w->handle();
+        if (!platformWindow)
+            continue;
+
+        platformWindow->deliverUpdateRequest();
     }
 }
 
