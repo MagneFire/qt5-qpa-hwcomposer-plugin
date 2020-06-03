@@ -333,12 +333,12 @@ HwComposerBackend_v11::sleepDisplay(bool sleep)
 
 #ifdef HWC_DEVICE_API_VERSION_1_4
         if (hwc_version == HWC_DEVICE_API_VERSION_1_4) {
-            HWC_PLUGIN_EXPECT_ZERO(hwc_device->setPowerMode(hwc_device, 0, HWC_POWER_MODE_OFF));
+            HWC_PLUGIN_EXPECT_ZERO(hwc_device->setPowerMode(hwc_device, 0, HWC_POWER_MODE_DOZE_SUSPEND));
         } else
 #endif
 #ifdef HWC_DEVICE_API_VERSION_1_5
         if (hwc_version == HWC_DEVICE_API_VERSION_1_5) {
-            HWC_PLUGIN_EXPECT_ZERO(hwc_device->setPowerMode(hwc_device, 0, HWC_POWER_MODE_OFF));
+            HWC_PLUGIN_EXPECT_ZERO(hwc_device->setPowerMode(hwc_device, 0, HWC_POWER_MODE_DOZE_SUSPEND));
         } else
 #endif
             HWC_PLUGIN_EXPECT_ZERO(hwc_device->blank(hwc_device, 0, 1));
