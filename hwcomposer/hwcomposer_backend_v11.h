@@ -63,6 +63,8 @@ public:
     virtual EGLNativeWindowType createWindow(int width, int height);
     virtual void destroyWindow(EGLNativeWindowType window);
     virtual void swap(EGLNativeDisplayType display, EGLSurface surface);
+    virtual bool ambientModeSupport() Q_DECL_OVERRIDE;
+    virtual void ambientModeEnabled(bool enable) Q_DECL_OVERRIDE;
     virtual void sleepDisplay(bool sleep);
     virtual float refreshRate();
 
@@ -79,6 +81,7 @@ private:
     uint32_t hwc_version;
     int num_displays;
 
+    bool m_ambientMode;
     bool m_displayOff;
     QBasicTimer m_deliverUpdateTimeout;
     QBasicTimer m_vsyncTimeout;

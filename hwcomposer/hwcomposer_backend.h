@@ -106,6 +106,8 @@ public:
     virtual EGLNativeWindowType createWindow(int width, int height) = 0;
     virtual void destroyWindow(EGLNativeWindowType window) = 0;
     virtual void swap(EGLNativeDisplayType display, EGLSurface surface) = 0;
+    virtual bool ambientModeSupport() {return false;}
+    virtual void ambientModeEnabled(bool enable) {Q_UNUSED(enable);}
     virtual void sleepDisplay(bool sleep) = 0;
     virtual float refreshRate() = 0;
 

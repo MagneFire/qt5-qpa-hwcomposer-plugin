@@ -320,6 +320,27 @@ HwComposerBackend_v11::swap(EGLNativeDisplayType display, EGLSurface surface)
 #endif
 }
 
+bool HwComposerBackend_v11::ambientModeSupport()
+{
+#ifdef HWC_DEVICE_API_VERSION_1_4
+        if (hwc_version == HWC_DEVICE_API_VERSION_1_4) {
+            return true;
+        } else
+#endif
+#ifdef HWC_DEVICE_API_VERSION_1_5
+        if (hwc_version == HWC_DEVICE_API_VERSION_1_5) {
+            return true;
+        } else
+#endif
+            return false;
+}
+
+void HwComposerBackend_v11::ambientModeEnabled(bool enable)
+{
+    if (ambientModeSupport()) {
+        m_ambientMode = enable;
+    }
+}
 void
 HwComposerBackend_v11::sleepDisplay(bool sleep)
 {
@@ -333,12 +354,20 @@ HwComposerBackend_v11::sleepDisplay(bool sleep)
 
 #ifdef HWC_DEVICE_API_VERSION_1_4
         if (hwc_version == HWC_DEVICE_API_VERSION_1_4) {
-            HWC_PLUGIN_EXPECT_ZERO(hwc_device->setPowerMode(hwc_device, 0, HWC_POWER_MODE_OFF));
+            if (m_ambientMode) {
+                HWC_PLUGIN_EXPECT_ZERO(hwc_device->setPowerMode(hwc_device, 0, HWC_POWER_MODE_DOZE_SUSPEND));
+            } else {
+                HWC_PLUGIN_EXPECT_ZERO(hwc_device->setPowerMode(hwc_device, 0, HWC_POWER_MODE_OFF));
+            }
         } else
 #endif
 #ifdef HWC_DEVICE_API_VERSION_1_5
         if (hwc_version == HWC_DEVICE_API_VERSION_1_5) {
-            HWC_PLUGIN_EXPECT_ZERO(hwc_device->setPowerMode(hwc_device, 0, HWC_POWER_MODE_OFF));
+            if (m_ambientMode) {
+                HWC_PLUGIN_EXPECT_ZERO(hwc_device->setPowerMode(hwc_device, 0, HWC_POWER_MODE_DOZE_SUSPEND));
+            } else {
+                HWC_PLUGIN_EXPECT_ZERO(hwc_device->setPowerMode(hwc_device, 0, HWC_POWER_MODE_OFF));
+            }
         } else
 #endif
             HWC_PLUGIN_EXPECT_ZERO(hwc_device->blank(hwc_device, 0, 1));

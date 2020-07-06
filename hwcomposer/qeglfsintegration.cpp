@@ -195,6 +195,12 @@ void *QEglFSIntegration::nativeResourceForIntegration(const QByteArray &resource
 
     if (lowerCaseResource == "egldisplay") {
         return static_cast<QEglFSScreen *>(mScreen)->display();
+    } else if (lowerCaseResource == "ambientsupported") {
+        return reinterpret_cast<void *>(mHwc->ambientModeSupport());
+    } else if (lowerCaseResource == "ambientenable") {
+        mHwc->ambientModeEnabled(true);
+    } else if (lowerCaseResource == "ambientdisable") {
+        mHwc->ambientModeEnabled(false);
     } else if (lowerCaseResource == "displayoff") {
         // Called from lipstick to turn off the display (src/homeapplication.cpp)
         mHwc->sleepDisplay(true);

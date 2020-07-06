@@ -79,6 +79,8 @@ public:
 
     void swapToWindow(QEglFSContext *context, QPlatformSurface *surface);
 
+    bool ambientModeSupport();
+    void ambientModeEnabled(bool enable);
     void sleepDisplay(bool sleep);
     qreal refreshRate() const;
 
@@ -88,6 +90,7 @@ private:
     HwComposerScreenInfo *info;
     HwComposerBackend *backend;
     bool display_off;
+    bool ambientMode;
     bool window_created;
     qreal fps;
 };

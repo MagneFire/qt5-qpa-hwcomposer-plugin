@@ -74,6 +74,7 @@ HwComposerContext::HwComposerContext()
     : info(new HwComposerScreenInfo())
     , backend(NULL)
     , display_off(false)
+    , ambientMode(false)
     , window_created(false)
     , fps(0)
 {
@@ -161,7 +162,7 @@ void HwComposerContext::destroyNativeWindow(EGLNativeWindowType window)
 
 void HwComposerContext::swapToWindow(QEglFSContext *context, QPlatformSurface *surface)
 {
-    if (display_off) {
+    if (display_off && !ambientMode) {
         qWarning("Swap requested while display is off");
         return;
     }
@@ -169,6 +170,18 @@ void HwComposerContext::swapToWindow(QEglFSContext *context, QPlatformSurface *s
     EGLDisplay egl_display = context->eglDisplay();
     EGLSurface egl_surface = context->eglSurfaceForPlatformSurface(surface);
     return backend->swap(egl_display, egl_surface);
+}
+bool HwComposerContext::ambientModeSupport()
+{
+    return backend->ambientModeSupport();
+}
+
+void HwComposerContext::ambientModeEnabled(bool enable)
+{
+    if (!ambientModeSupport()) return;
+
+    ambientMode = enable;
+    backend->ambientModeEnabled(enable);
 }
 
 void HwComposerContext::sleepDisplay(bool sleep)
