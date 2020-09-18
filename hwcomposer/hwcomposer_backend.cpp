@@ -62,6 +62,7 @@ HwComposerBackend::create()
 {
     hw_module_t *hwc_module = NULL;
     hw_device_t *hwc_device = NULL;
+    power_module_t *pwr_module = NULL;
 
     // Some implementations insist on having the framebuffer module opened before loading
     // the hardware composer one. Therefor we rely on using the fbdev HYBRIS_EGLPLATFORM
@@ -69,6 +70,11 @@ HwComposerBackend::create()
     if (qEnvironmentVariableIsEmpty("QT_QPA_NO_FRAMEBUFFER_FIRST")) {
 	    eglGetDisplay(EGL_DEFAULT_DISPLAY);
     }
+
+    // Open power module for setting interactive state based on screen on/off.
+    HWC_PLUGIN_ASSERT_ZERO(hw_get_module(POWER_HARDWARE_MODULE_ID, (const hw_module_t **)(&pwr_module)));
+
+    pwr_module->init(pwr_module);
 
     // Open hardware composer
     HWC_PLUGIN_ASSERT_ZERO(hw_get_module(HWC_HARDWARE_MODULE_ID, (const hw_module_t **)(&hwc_module)));
@@ -133,7 +139,7 @@ HwComposerBackend::create()
 #endif
             // HWC_NUM_DISPLAY_TYPES is the actual size of the array, otherwise
             // underrun/overruns happen
-            return new HwComposerBackend_v11(hwc_module, hwc_device, HWC_NUM_DISPLAY_TYPES);
+            return new HwComposerBackend_v11(hwc_module, hwc_device, pwr_module, HWC_NUM_DISPLAY_TYPES);
             break;
 #endif /* HWC_PLUGIN_HAVE_HWCOMPOSER1_API */
         default:

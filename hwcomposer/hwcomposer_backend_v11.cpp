@@ -152,9 +152,10 @@ void HWComposer::present(HWComposerNativeWindowBuffer *buffer)
     }
 }
 
-HwComposerBackend_v11::HwComposerBackend_v11(hw_module_t *hwc_module, hw_device_t *hw_device, int num_displays)
+HwComposerBackend_v11::HwComposerBackend_v11(hw_module_t *hwc_module, hw_device_t *hw_device, power_module_t *pw_device, int num_displays)
     : HwComposerBackend(hwc_module)
     , hwc_device((hwc_composer_device_1_t *)hw_device)
+    , pwr_device(pw_device)
     , hwc_list(NULL)
     , hwc_mList(NULL)
     , num_displays(num_displays)
@@ -371,7 +372,13 @@ HwComposerBackend_v11::sleepDisplay(bool sleep)
         } else
 #endif
             HWC_PLUGIN_EXPECT_ZERO(hwc_device->blank(hwc_device, 0, 1));
+
+        // Enter non-interactive state after turning off the screen.
+        pwr_device->setInteractive(pwr_device, false);
     } else {
+        // Enter interactive state prior to turning on the screen.
+        pwr_device->setInteractive(pwr_device, true);
+
 #ifdef HWC_DEVICE_API_VERSION_1_4
         if (hwc_version == HWC_DEVICE_API_VERSION_1_4) {
             HWC_PLUGIN_EXPECT_ZERO(hwc_device->setPowerMode(hwc_device, 0, HWC_POWER_MODE_NORMAL));

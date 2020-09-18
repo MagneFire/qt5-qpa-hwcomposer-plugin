@@ -48,6 +48,7 @@
 #include <android-config.h>
 #include <hardware/hardware.h>
 #include <hardware/hwcomposer.h>
+#include <hardware/power.h>
 
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
@@ -118,6 +119,7 @@ protected:
     virtual ~HwComposerBackend();
 
     hw_module_t *hwc_module;
+    power_module_t *pwr_module;
 };
 
 #endif /* HWCOMPOSER_BACKEND_H */
