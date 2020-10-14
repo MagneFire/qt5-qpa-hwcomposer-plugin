@@ -374,10 +374,14 @@ HwComposerBackend_v11::sleepDisplay(bool sleep)
             HWC_PLUGIN_EXPECT_ZERO(hwc_device->blank(hwc_device, 0, 1));
 
         // Enter non-interactive state after turning off the screen.
-        pwr_device->setInteractive(pwr_device, false);
+        if (pwr_device) {
+            pwr_device->setInteractive(pwr_device, false);
+        }
     } else {
         // Enter interactive state prior to turning on the screen.
-        pwr_device->setInteractive(pwr_device, true);
+        if (pwr_device) {
+            pwr_device->setInteractive(pwr_device, true);
+        }
 
 #ifdef HWC_DEVICE_API_VERSION_1_4
         if (hwc_version == HWC_DEVICE_API_VERSION_1_4) {

@@ -72,9 +72,11 @@ HwComposerBackend::create()
     }
 
     // Open power module for setting interactive state based on screen on/off.
-    HWC_PLUGIN_ASSERT_ZERO(hw_get_module(POWER_HARDWARE_MODULE_ID, (const hw_module_t **)(&pwr_module)));
-
-    pwr_module->init(pwr_module);
+    if (!hw_get_module(POWER_HARDWARE_MODULE_ID, (const hw_module_t **)(&pwr_module))) {
+        pwr_module->init(pwr_module);
+    } else {
+        fprintf(stderr, "Failed to initialize PowerHAL, Ambient mode may not work\n");
+    }
 
     // Open hardware composer
     HWC_PLUGIN_ASSERT_ZERO(hw_get_module(HWC_HARDWARE_MODULE_ID, (const hw_module_t **)(&hwc_module)));
