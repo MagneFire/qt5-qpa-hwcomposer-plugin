@@ -68,11 +68,7 @@ public:
 
     QPlatformFontDatabase *fontDatabase() const;
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 2, 0)
-    QAbstractEventDispatcher *guiThreadEventDispatcher() const;
-#else
     QAbstractEventDispatcher *createEventDispatcher() const;
-#endif
 
     QVariant styleHint(QPlatformIntegration::StyleHint hint) const;
 

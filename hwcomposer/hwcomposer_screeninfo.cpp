@@ -213,6 +213,7 @@ QT_BEGIN_NAMESPACE
 
 HwComposerScreenInfo::HwComposerScreenInfo()
 {
+    qDebug() << "HwComposerScreenInfo::HwComposerScreenInfo()";
     /**
      * Look up the values in the following order of preference:
      *

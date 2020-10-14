@@ -65,6 +65,7 @@
 #include "qeglfscontext.h"
 
 #include <EGL/egl.h>
+#include <QDebug>
 
 QT_BEGIN_NAMESPACE
 
@@ -79,12 +80,18 @@ public:
 
 QEglFSIntegration::QEglFSIntegration()
     : mHwc(NULL)
-    , mEventDispatcher(createUnixEventDispatcher())
-    , mFontDb(new QGenericUnixFontDatabase())
 {
-#if QT_VERSION < QT_VERSION_CHECK(5, 2, 0)
-    QGuiApplicationPrivate::instance()->setEventDispatcher(mEventDispatcher);
-#endif
+    qDebug() << "QEglFSIntegration::QEglFSIntegration() 0";
+
+
+
+    mEventDispatcher = QtGenericUnixDispatcher::createUnixEventDispatcher();
+    
+    qDebug() << "QEglFSIntegration::QEglFSIntegration() 1";
+    mFontDb = new QGenericUnixFontDatabase();
+    qDebug() << "QEglFSIntegration::QEglFSIntegration() 2";
+
+    qDebug() << "QEglFSIntegration::QEglFSIntegration() 3";
 
     mHwc = new HwComposerContext();
 
@@ -167,11 +174,7 @@ QPlatformFontDatabase *QEglFSIntegration::fontDatabase() const
     return mFontDb;
 }
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 2, 0)
-QAbstractEventDispatcher *QEglFSIntegration::guiThreadEventDispatcher() const
-#else
 QAbstractEventDispatcher *QEglFSIntegration::createEventDispatcher() const
-#endif
 {
     return mEventDispatcher;
 }

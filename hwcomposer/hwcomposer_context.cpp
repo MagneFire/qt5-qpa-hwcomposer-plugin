@@ -78,6 +78,7 @@ HwComposerContext::HwComposerContext()
     , window_created(false)
     , fps(0)
 {
+    qDebug() << "HwComposerContext::HwComposerContext()";
     // We need to catch the SIGTERM and SIGINT signals, so that we can do a
     // proper shutdown of Qt and the plugin, and avoid crashes, hangs and
     // reboots in cases where we don't properly close the hwcomposer.

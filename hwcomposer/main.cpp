@@ -41,6 +41,7 @@
 
 #include <qpa/qplatformintegrationplugin.h>
 #include "qeglfsintegration.h"
+#include <QDebug>
 
 QT_BEGIN_NAMESPACE
 
@@ -55,6 +56,7 @@ public:
 QPlatformIntegration* QEglFShwcIntegrationPlugin::create(const QString& system, const QStringList& paramList)
 {
     Q_UNUSED(paramList);
+    qDebug() << "QEglFShwcIntegrationPlugin::create()";
     if (!system.compare(QLatin1String("hwcomposer"), Qt::CaseInsensitive))
         return new QEglFSIntegration();
 
