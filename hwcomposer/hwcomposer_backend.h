@@ -49,6 +49,7 @@
 #include <android-config.h>
 #include <hardware/hardware.h>
 #include <hardware/hwcomposer.h>
+#include <hardware/power.h>
 
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
@@ -107,6 +108,8 @@ public:
     virtual EGLNativeWindowType createWindow(int width, int height) = 0;
     virtual void destroyWindow(EGLNativeWindowType window) = 0;
     virtual void swap(EGLNativeDisplayType display, EGLSurface surface) = 0;
+    virtual bool ambientModeSupport() {return false;}
+    virtual void ambientModeEnabled(bool enable) {Q_UNUSED(enable);}
     virtual void sleepDisplay(bool sleep) = 0;
     virtual float refreshRate() = 0;
 
@@ -119,6 +122,7 @@ protected:
     virtual ~HwComposerBackend();
 
     hw_module_t *hwc_module;
+    power_module_t *pwr_module;
     void *libminisf;
 };
 

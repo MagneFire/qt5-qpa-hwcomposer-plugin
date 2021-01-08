@@ -178,10 +178,11 @@ void HWComposer::present(HWComposerNativeWindowBuffer *buffer)
     }
 }
 
-HwComposerBackend_v11::HwComposerBackend_v11(hw_module_t *hwc_module, hw_device_t *hw_device, void *libminisf, int num_displays)
+HwComposerBackend_v11::HwComposerBackend_v11(hw_module_t *hwc_module, hw_device_t *hw_device, power_module_t *pw_device, void *libminisf, int num_displays)
     : HwComposerBackend(hwc_module, libminisf)
     , hwc_device((hwc_composer_device_1_t *)hw_device)
     , hwc_list(NULL)
+    , pwr_device(pw_device)
     , hwc_mList(NULL)
     , num_displays(num_displays)
     , m_displayOff(true)
@@ -346,6 +347,28 @@ HwComposerBackend_v11::swap(EGLNativeDisplayType display, EGLSurface surface)
 #endif
 }
 
+bool HwComposerBackend_v11::ambientModeSupport()
+{
+#ifdef HWC_DEVICE_API_VERSION_1_4
+    if (hwc_version == HWC_DEVICE_API_VERSION_1_4) {
+        return true;
+    } else
+#endif
+#ifdef HWC_DEVICE_API_VERSION_1_5
+    if (hwc_version == HWC_DEVICE_API_VERSION_1_5) {
+        return true;
+    } else
+#endif
+    return false;
+}
+
+void HwComposerBackend_v11::ambientModeEnabled(bool enable)
+{
+    if (ambientModeSupport()) {
+        m_ambientMode = enable;
+    }
+}
+
 void
 HwComposerBackend_v11::sleepDisplay(bool sleep)
 {
@@ -359,16 +382,33 @@ HwComposerBackend_v11::sleepDisplay(bool sleep)
 
 #ifdef HWC_DEVICE_API_VERSION_1_4
         if (hwc_version == HWC_DEVICE_API_VERSION_1_4) {
-            HWC_PLUGIN_EXPECT_ZERO(hwc_device->setPowerMode(hwc_device, 0, HWC_POWER_MODE_OFF));
+            if (m_ambientMode) {
+                HWC_PLUGIN_EXPECT_ZERO(hwc_device->setPowerMode(hwc_device, 0, HWC_POWER_MODE_DOZE_SUSPEND));
+            } else {
+                HWC_PLUGIN_EXPECT_ZERO(hwc_device->setPowerMode(hwc_device, 0, HWC_POWER_MODE_OFF));
+            }
         } else
 #endif
 #ifdef HWC_DEVICE_API_VERSION_1_5
         if (hwc_version == HWC_DEVICE_API_VERSION_1_5) {
-            HWC_PLUGIN_EXPECT_ZERO(hwc_device->setPowerMode(hwc_device, 0, HWC_POWER_MODE_OFF));
+            if (m_ambientMode) {
+                HWC_PLUGIN_EXPECT_ZERO(hwc_device->setPowerMode(hwc_device, 0, HWC_POWER_MODE_DOZE_SUSPEND));
+            } else {
+                HWC_PLUGIN_EXPECT_ZERO(hwc_device->setPowerMode(hwc_device, 0, HWC_POWER_MODE_OFF));
+            }
         } else
 #endif
             HWC_PLUGIN_EXPECT_ZERO(hwc_device->blank(hwc_device, 0, 1));
+
+        // Enter non-interactive state after turning off the screen.
+        if (pwr_device) {
+            pwr_device->setInteractive(pwr_device, false);
+        }
     } else {
+        // Enter interactive state prior to turning on the screen.
+        if (pwr_device) {
+            pwr_device->setInteractive(pwr_device, true);
+        }
 #ifdef HWC_DEVICE_API_VERSION_1_4
         if (hwc_version == HWC_DEVICE_API_VERSION_1_4) {
             HWC_PLUGIN_EXPECT_ZERO(hwc_device->setPowerMode(hwc_device, 0, HWC_POWER_MODE_NORMAL));

@@ -75,6 +75,7 @@ HwComposerBackend::create()
 {
     hw_module_t *hwc_module = NULL;
     hw_device_t *hwc_device = NULL;
+    power_module_t *pwr_module = NULL;
     void *libminisf;
     void (*startMiniSurfaceFlinger)(void) = NULL;
 
@@ -100,7 +101,22 @@ HwComposerBackend::create()
     if (startMiniSurfaceFlinger) {
 	startMiniSurfaceFlinger();
     } else {
-	fprintf(stderr, "libminisf is incompatible or missing. Can not possibly start the SurfaceFlinger service. If you're experiencing troubles with media try updating droidmedia (and/or this plugin).");
+	fprintf(stderr, "libminisf is incompatible or missing. Can not possibly start the SurfaceFlinger service. If you're experiencing troubles with media try updating droidmedia (and/or this plugin).\n");
+    }
+
+    // Open power module for setting interactive state based on screen on/off.
+    if (!hw_get_module(POWER_HARDWARE_MODULE_ID, (const hw_module_t **)(&pwr_module))) {
+        pwr_module->init(pwr_module);
+        fprintf(stderr, "== power module ==\n");
+        fprintf(stderr, " * Address: %p\n", pwr_module);
+        fprintf(stderr, " * Module API Version: %x\n", pwr_module->common.module_api_version);
+        fprintf(stderr, " * HAL API Version: %x\n", pwr_module->common.hal_api_version); /* should be zero */
+        fprintf(stderr, " * Identifier: %s\n", pwr_module->common.id);
+        fprintf(stderr, " * Name: %s\n", pwr_module->common.name);
+        fprintf(stderr, " * Author: %s\n", pwr_module->common.author);
+        fprintf(stderr, "== power module ==\n");
+    } else {
+        fprintf(stderr, "PowerHAL is missing or not working, display doze mode may not work\n");
     }
 
     // Open hardware composer
@@ -166,7 +182,7 @@ HwComposerBackend::create()
 #endif
             // HWC_NUM_DISPLAY_TYPES is the actual size of the array, otherwise
             // underrun/overruns happen
-            return new HwComposerBackend_v11(hwc_module, hwc_device, libminisf, HWC_NUM_DISPLAY_TYPES);
+            return new HwComposerBackend_v11(hwc_module, hwc_device, pwr_module, libminisf, HWC_NUM_DISPLAY_TYPES);
             break;
 #endif /* HWC_PLUGIN_HAVE_HWCOMPOSER1_API */
 #ifdef HWC_PLUGIN_HAVE_HWCOMPOSER2_API

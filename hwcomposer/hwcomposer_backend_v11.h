@@ -56,13 +56,15 @@ class QWindow;
 
 class HwComposerBackend_v11 : public QObject, public HwComposerBackend {
 public:
-    HwComposerBackend_v11(hw_module_t *hwc_module, hw_device_t *hw_device, void *libminisf, int num_displays);
+    HwComposerBackend_v11(hw_module_t *hwc_module, hw_device_t *hw_device, power_module_t *pw_device, void *libminisf, int num_displays);
     virtual ~HwComposerBackend_v11();
 
     virtual EGLNativeDisplayType display();
     virtual EGLNativeWindowType createWindow(int width, int height);
     virtual void destroyWindow(EGLNativeWindowType window);
     virtual void swap(EGLNativeDisplayType display, EGLSurface surface);
+    virtual bool ambientModeSupport() Q_DECL_OVERRIDE;
+    virtual void ambientModeEnabled(bool enable) Q_DECL_OVERRIDE;
     virtual void sleepDisplay(bool sleep);
     virtual float refreshRate();
     virtual bool getScreenSizes(int *width, int *height, float *physical_width, float *physical_height);
@@ -76,11 +78,13 @@ public:
 private:
     int getSingleAttribute(uint32_t attribute);
     hwc_composer_device_1_t *hwc_device;
+    power_module_t *pwr_device;
     hwc_display_contents_1_t *hwc_list;
     hwc_display_contents_1_t **hwc_mList;
     uint32_t hwc_version;
     int num_displays;
 
+    bool m_ambientMode;
     bool m_displayOff;
     QBasicTimer m_deliverUpdateTimeout;
     QBasicTimer m_vsyncTimeout;
